@@ -6,6 +6,17 @@
       <p>Координаты: x: {{ pixelInfo.x }}, y: {{ pixelInfo.y }}</p>
       <p>Размер изображения: ширина: {{ imageWidth }}px, высота: {{ imageHeight }}px</p>
     </div>
+    <div class="d-flex flex-column">
+      <div>
+        <div class="text-caption">
+          Масштабирование
+        </div>
+        <v-slider
+          v-model="slider2"
+          thumb-label="always"
+        ></v-slider>
+      </div>
+    </div>
     <v-form v-if="type === 'local'">
       <v-file-input label="Выберите файл" @change="uploadLocal"></v-file-input>
     </v-form>
@@ -23,6 +34,7 @@ export default {
   },
   data() {
     return {
+      slider2: 100,
       imageUrl: "",
       pixelInfo: null,
       imageWidth: 0,
@@ -78,3 +90,10 @@ export default {
   }
 }
 </script>
+
+<style>
+canvas {
+  width: 100%;
+  height: 100vh;
+}
+</style>
