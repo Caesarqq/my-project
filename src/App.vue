@@ -3,7 +3,7 @@
     <v-layout row justify-center>
       <v-dialog v-model="dialog" persistent max-width="500">
         <template v-slot:activator="{ on }">
-          <v-btn color="primary" dark v-on="on" class="mt-5 white">Загрузить изображение</v-btn>
+          <v-btn color="primary" dark v-on="on" class="white">Загрузить изображение</v-btn>
         </template>
         <v-card>
           <v-card-title class="headline">Хотите загрузить изображение?</v-card-title>
@@ -47,3 +47,6 @@ export default {
 }
 }
 </script>
+
+<style>
+</style>

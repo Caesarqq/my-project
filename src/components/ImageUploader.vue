@@ -1,5 +1,5 @@
 <template>
-  <v-container>
+  <div class="canvasmain">
     <canvas ref="canvas" @click="getPixelColor" @mousemove="getPixelColor"></canvas>
     <div v-if="pixelInfo">
       <p>Цвет: rgb({{ pixelInfo.color.r }}, {{ pixelInfo.color.g }}, {{ pixelInfo.color.b }})</p>
@@ -7,23 +7,27 @@
       <p>Размер изображения: ширина: {{ imageWidth }}px, высота: {{ imageHeight }}px</p>
     </div>
     <v-slider
-    v-model="slider"
-    :max="max"
-    :min="min"
-    class="align-center"
-    hide-details
-  >
-    <template v-slot:append>
-      <v-text-field
-        v-model="slider"
-        density="compact"
-        style="width: 70px"
-        type="number"
-        hide-details
-        single-line
-      ></v-text-field>
-    </template>
-  </v-slider>
+      v-model="slider"
+      :max="max"
+      :min="min"
+      class="align-center"
+      hide-details
+    >
+      <template v-slot:append>
+        <v-text-field
+          v-model="slider"
+          density="compact"
+          style="width: 70px"
+          type="number"
+          hide-details
+          single-line
+        >
+          <template v-slot:append-outer>
+            %
+          </template>
+        </v-text-field>
+      </template>
+    </v-slider>
     <v-form v-if="type === 'local'">
       <v-file-input label="Выберите файл" @change="uploadLocal"></v-file-input>
     </v-form>
@@ -31,7 +35,7 @@
       <v-text-field label="Введите URL изображения" v-model="imageUrl"></v-text-field>
       <v-btn @click="uploadFromUrl">Загрузить</v-btn>
     </v-form>
-  </v-container>
+  </div>
 </template>
 
 <script>
@@ -50,6 +54,11 @@ export default {
       imageHeight: 0
     };
   },
+  computed: {
+    formattedSlider() {
+      return `${this.slider}%`;
+    },
+  },
   methods: {
     drawImageToCanvas(image) {
       const canvas = this.$refs.canvas;
@@ -65,8 +74,8 @@ export default {
       const canvas = this.$refs.canvas;
       const ctx = canvas.getContext('2d');
       const rect = canvas.getBoundingClientRect();
-      const x = event.clientX - rect.left;
-      const y = event.clientY - rect.top;
+      const x = Math.floor(event.clientX - rect.left);
+      const y = Math.floor(event.clientY - rect.top);
       const pixel = ctx.getImageData(x, y, 1, 1).data;
       this.pixelInfo = {
         color: {
@@ -101,8 +110,21 @@ export default {
 </script>
 
 <style>
+
+/* body{
+  overflow: hidden;
+} */
 canvas {
-  width: 100%;
+  width: 1500px;
   height: 100vh;
 }
+.row{
+  margin: 0px;
+}
+
+/* .canvasmain {
+  display: flex;
+  justify-content: center; 
+  width: 100%;
+} */
 </style>
