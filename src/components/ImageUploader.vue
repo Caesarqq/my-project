@@ -1,11 +1,6 @@
 <template>
   <div class="canvasmain">
-    <canvas ref="canvas" @click="getPixelColor" @mousemove="getPixelColor"></canvas>
-    <div v-if="pixelInfo">
-      <p>Цвет: rgb({{ pixelInfo.color.r }}, {{ pixelInfo.color.g }}, {{ pixelInfo.color.b }})</p>
-      <p>Координаты: x: {{ pixelInfo.x }}, y: {{ pixelInfo.y }}</p>
-      <p>Размер изображения: ширина: {{ imageWidth }}px, высота: {{ imageHeight }}px</p>
-    </div>
+    <image-pixel-search ref="pixelSearch"></image-pixel-search>
     <v-slider
       v-model="slider"
       :max="max"
@@ -15,17 +10,13 @@
     >
       <template v-slot:append>
         <v-text-field
-          v-model="slider"
+          v-model="sliderPercent"
           density="compact"
-          style="width: 70px"
-          type="number"
+          style="width: 40px"
+          type="text"
           hide-details
           single-line
-        >
-          <template v-slot:append-outer>
-            %
-          </template>
-        </v-text-field>
+        ></v-text-field>
       </template>
     </v-slider>
     <v-form v-if="type === 'local'">
@@ -39,78 +30,44 @@
 </template>
 
 <script>
+import ImagePixelSearch from './ImagePixelSearch.vue';
+
 export default {
+  components: {
+    ImagePixelSearch
+  },
   props: {
     type: String
   },
   data() {
     return {
       min: 12,
-        max: 300,
-        slider: 100,
-      imageUrl: "",
-      pixelInfo: null,
-      imageWidth: 0,
-      imageHeight: 0
+      max: 300,
+      slider: 100,
+      imageUrl: ""
     };
   },
   computed: {
-    formattedSlider() {
+    sliderPercent() {
       return `${this.slider}%`;
-    },
+    }
   },
   methods: {
-    drawImageToCanvas(image) {
-      const canvas = this.$refs.canvas;
-      const ctx = canvas.getContext('2d');
-      this.imageWidth = image.width;
-      this.imageHeight = image.height;
-      canvas.width = image.width;
-      canvas.height = image.height;
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      ctx.drawImage(image, 0, 0);
-    },
-    getPixelColor(event) {
-      const canvas = this.$refs.canvas;
-      const ctx = canvas.getContext('2d');
-      const rect = canvas.getBoundingClientRect();
-      const x = Math.floor(event.clientX - rect.left);
-      const y = Math.floor(event.clientY - rect.top);
-      const pixel = ctx.getImageData(x, y, 1, 1).data;
-      this.pixelInfo = {
-        color: {
-          r: pixel[0],
-          g: pixel[1],
-          b: pixel[2]
-        },
-        x: x,
-        y: y
-      };
-    },
     uploadLocal(file) {
       const reader = new FileReader();
       reader.onload = (e) => {
-        const img = new Image();
-        img.onload = () => {
-          this.drawImageToCanvas(img);
-        };
-        img.src = e.target.result;
+        this.$refs.pixelSearch.loadImage(e.target.result);
       };
       reader.readAsDataURL(file);
     },
     uploadFromUrl() {
-      const img = new Image();
-      img.onload = () => {
-        this.drawImageToCanvas(img);
-      };
-      img.src = this.imageUrl;
+      this.$refs.pixelSearch.loadImage(this.imageUrl);
     }
   }
 }
 </script>
 
 <style>
-
 /* body{
   overflow: hidden;
 } */
