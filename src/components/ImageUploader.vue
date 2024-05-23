@@ -56,12 +56,31 @@ export default {
     uploadLocal(file) {
       const reader = new FileReader();
       reader.onload = (e) => {
-        this.$refs.pixelSearch.loadImage(e.target.result);
+        const img = new Image();
+        img.onload = () => {
+          this.drawImageToCanvas(img);
+        };
+        img.src = e.target.result;
       };
       reader.readAsDataURL(file);
     },
     uploadFromUrl() {
-      this.$refs.pixelSearch.loadImage(this.imageUrl);
+      const img = new Image();
+      img.crossOrigin = 'Anonymous';
+      img.onload = () => {
+        this.drawImageToCanvas(img);
+      };
+      img.src = this.imageUrl;
+    },
+    drawImageToCanvas(image) {
+      const canvas = this.$refs.pixelSearch.$refs.canvas;
+      const ctx = canvas.getContext('2d');
+      this.$refs.pixelSearch.imageWidth = image.width;
+      this.$refs.pixelSearch.imageHeight = image.height;
+      canvas.width = image.width;
+      canvas.height = image.height;
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.drawImage(image, 0, 0);
     }
   }
 }
