@@ -11,11 +11,19 @@
 
 <script>
 export default {
+  props: {
+    imageWidth: {
+      type: Number,
+      required: true
+    },
+    imageHeight: {
+      type: Number,
+      required: true
+    }
+  },
   data() {
     return {
-      pixelInfo: null,
-      imageWidth: 0,
-      imageHeight: 0
+      pixelInfo: null
     };
   },
   methods: {
