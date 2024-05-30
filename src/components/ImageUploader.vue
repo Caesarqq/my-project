@@ -27,7 +27,7 @@
     <p>Исходное количество пикселей: {{ originalPixels }} Мп</p>
     <p>Количество пикселей после масштабирования: {{ scaledPixels }} Мп</p>
   </div>
-  <image-colors></image-colors>
+  <image-colors :pixelSearchRef="$refs.pixelSearch"></image-colors>
 </div>
 </template>
 
