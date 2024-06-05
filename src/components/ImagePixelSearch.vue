@@ -1,12 +1,12 @@
 <template>
-<div class="canvas-container">
-  <canvas ref="canvas" @click="getPixelColor" @mousemove="getPixelColor"></canvas>
-  <div v-if="pixelInfo" class="padding">
-    <p>Цвет: rgb({{ pixelInfo.color.r }}, {{ pixelInfo.color.g }}, {{ pixelInfo.color.b }})</p>
-    <p>Координаты: x: {{ pixelInfo.x }}, y: {{ pixelInfo.y }}</p>
-    <p>Размер изображения: ширина: {{ imageWidth }}px, высота: {{ imageHeight }}px</p>
+  <div class="canvas-container">
+    <canvas ref="canvas" @click="getPixelColor" @mousemove="getPixelColor"></canvas>
+    <div v-if="pixelInfo" class="padding">
+      <p>Цвет: rgb({{ pixelInfo.color.r }}, {{ pixelInfo.color.g }}, {{ pixelInfo.color.b }})</p>
+      <p>Координаты: x: {{ pixelInfo.x }}, y: {{ pixelInfo.y }}</p>
+      <p>Размер изображения: ширина: {{ imageWidth }}px, высота: {{ imageHeight }}px</p>
+    </div>
   </div>
-</div>
 </template>
 
 <script>

@@ -1,11 +1,8 @@
 <template>
 <div class="canvasmain">
-  <image-pixel-search 
-    ref="pixelSearch"
-    :imageWidth="imageWidth"
-    :imageHeight="imageHeight"
-    class="canvas-container">
-  </image-pixel-search>
+  <div class="canvas-container">
+    <canvas ref="pixelSearch"></canvas>
+  </div>
   <image-settings
     ref="imageSettings"
     :resizeDialog="resizeDialog"
@@ -28,19 +25,33 @@
     <p>Количество пикселей после масштабирования: {{ scaledPixels }} Мп</p>
   </div>
   <image-colors :pixelSearchRef="$refs.pixelSearch"></image-colors>
+  <image-chart :image="image" @update-image="updateImage" v-if="image"></image-chart>
+  <v-btn class="filters-button" @click="showFilters = true" color="blue">Фильтры</v-btn>
+  <image-filters 
+    v-if="showFilters" 
+    @close="showFilters = false"
+    :ctxRef="$refs.pixelSearch.getContext('2d')"
+    :dx="0"
+    :dy="0"
+    :nowW="imageWidth"
+    :nowH="imageHeight"
+    :startImage="image"
+  ></image-filters>
 </div>
 </template>
 
 <script>
-import ImagePixelSearch from './ImagePixelSearch.vue';
-import ImageColors from './ImageColors.vue';
 import ImageSettings from './ImageSettings.vue';
+import ImageColors from './ImageColors.vue';
+import ImageChart from './ImageChart.vue';
+import ImageFilters from './ImageFilters.vue';
 
 export default {
   components: {
-    ImagePixelSearch,
+    ImageSettings,
     ImageColors,
-    ImageSettings
+    ImageChart,
+    ImageFilters
   },
   props: {
     type: String
@@ -54,7 +65,8 @@ export default {
       imageWidth: 0,
       imageHeight: 0,
       resizeDialog: false,
-      interpolation: 'nearest'
+      interpolation: 'nearest',
+      showFilters: false
     };
   },
   methods: {
@@ -92,26 +104,18 @@ export default {
     drawImageToCanvas() {
       if (!this.image) return;
 
-      const canvas = this.$refs.pixelSearch.$refs.canvas;
+      const canvas = this.$refs.pixelSearch;
       const ctx = canvas.getContext('2d');
-      const canvasWidth = canvas.parentElement.clientWidth;
-      const canvasHeight = canvas.parentElement.clientHeight;
 
-      const scaledWidth = this.imageWidth;
-      const scaledHeight = this.imageHeight;
-
-      const x = (canvasWidth - scaledWidth) / 2;
-      const y = (canvasHeight - scaledHeight) / 2;
-
-      canvas.width = canvasWidth;
-      canvas.height = canvasHeight;
+      canvas.width = this.imageWidth;
+      canvas.height = this.imageHeight;
 
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
       if (this.interpolation === 'nearest') {
-        this.drawNearestNeighbor(ctx, this.image, scaledWidth, scaledHeight);
+        this.drawNearestNeighbor(ctx, this.image, this.imageWidth, this.imageHeight);
       } else if (this.interpolation === 'none') {
-        ctx.drawImage(this.image, x, y, scaledWidth, scaledHeight);
+        ctx.drawImage(this.image, 0, 0, this.imageWidth, this.imageHeight);
       }
     },
     drawNearestNeighbor(ctx, img, width, height) {
@@ -137,7 +141,7 @@ export default {
         }
       }
 
-      ctx.putImageData(scaledImgData, (ctx.canvas.width - width) / 2, (ctx.canvas.height - height) / 2);
+      ctx.putImageData(scaledImgData, 0, 0);
     },
     onResize({ width, height }) {
       this.imageWidth = Math.round(width);
@@ -148,21 +152,26 @@ export default {
     onInterpolationChange(method) {
       this.interpolation = method;
       this.drawImageToCanvas();
+    },
+    updateImage(imageDataUrl) {
+      const img = new Image();
+      img.onload = () => {
+        this.image = img;
+        this.drawImageToCanvas();
+      };
+      img.src = imageDataUrl;
     }
   },
   mounted() {
-    this.$refs.imageSettings.setCanvasRef(this.$refs.pixelSearch.$refs.canvas);
+    this.$refs.imageSettings.setCanvasRef(this.$refs.pixelSearch);
   }
 }
 </script>
 
 <style>
-/* body{
-  overflow: hidden;
-} */
 canvas {
   width: 1500px;
-  height: 100vh;
+  height: auto;
   padding: 50px;
 }
 .row{
@@ -171,9 +180,4 @@ canvas {
 .padding{
   padding-left: 50px;
 }
-/* .canvasmain {
-  display: flex;
-  justify-content: center; 
-  width: 100%;
-} */
 </style>
